@@ -9,7 +9,7 @@ Features:
  * An optional animation flashes the key that triggered the macro while the macro is running, returning to the normal backlight level when the macro is done
  * Macro definition is compatible with the current VIA launcher without any modifications
 
-## Macro Definition
+## Macro definition
 
 Special rarely-used keycodes are used to tell concurrent macros to repeat and how.
  * `KC_F21` : start macro repeat section.
@@ -25,7 +25,17 @@ So for example, let's say you want the macro to start with "abc" then repeat the
 
 `abc{KC_F21}def{KC_F22}ghi`
 
-Note that if you don't need a preamble, you just omit that part and also `{KC_F21}`.  If you don't need a postamble, just omit that part.
+Note that if you don't need a preamble, you just omit that part and also `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.  If you don't need a postamble, just omit that part.
+
+## Special keycodes can be changed if desired
+
+If your game (or other application) uses KC_F21 through KC_F24 for some purpose, and you want your macro to emit those keycodes, you'll need to change concurrent macros' special keycodes by adding new definitions in your keyboard's `config.h` file.  The defaults are shown below:
+```
+#define KC_HARD_STOP_OTHER_MACROS KC_F23
+#define KC_REPEAT_UNTIL_TOGGLE_OFF KC_F24
+#define KC_REPEAT_UNTIL_MACRO_KEY_UP KC_F22
+#define KC_START_REPEAT KC_F21
+```
 
 ## Concurrency is the devil's play toy
 
