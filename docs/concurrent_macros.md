@@ -30,7 +30,7 @@ Note that if you don't need a preamble, you just omit that part and also `{KC_F2
 
 ## Concurrency is the devil's play toy
 
-One thing to be mindful of is that if you activate modifier keys, such as Shift, Ctrl, Alt, AltGr, and GUI, those modifiers will affect other currently running macros as well as anything you may be typing at the moment (even on a different keyboard).  So it is a very good practice to completely avoid using modifier keys in macros, unless you are not running the macro concurrently with any other keyboard usage (e.g. you are using a single macro in a repeat mode, and not touching any other keys).
+One thing to be mindful of is that if you activate modifier keys, such as Shift, Ctrl, Alt, AltGr, and GUI, those modifiers will affect other currently running macros as well as anything you may be typing at the moment (even on a different keyboard).  So it is a very good practice to completely avoid using modifier keys in macros, unless you are running only the one macro and not providing any other keyboard input while it runs, for example you are using a single macro in a repeat mode, and not touching any other keys.
 
 ## Configuration
 
@@ -44,7 +44,7 @@ TBD
 
 ### Special keycodes can be changed
 
-If your game (or other application) uses KC_F21 through KC_F24 for some purpose, and you want your macro to emit those keycodes, you'll need to change concurrent macros' special keycodes by adding new definitions in your keyboard's `config.h` file.  The defaults are shown below:
+If your game (or other application) uses F21 through F24 for some purpose, and you want your macro to emit those keycodes, you'll need to change concurrent macros' special keycodes by adding new definitions in your keyboard's `config.h` file.  The defaults are shown below:
 ```
 #define KC_HARD_STOP_OTHER_MACROS KC_F23
 #define KC_REPEAT_UNTIL_TOGGLE_OFF KC_F24
