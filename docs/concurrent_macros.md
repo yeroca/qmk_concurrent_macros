@@ -27,7 +27,22 @@ So for example, let's say you want the macro to start with "abc" then repeat the
 
 Note that if you don't need a preamble, you just omit that part and also `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.  If you don't need a postamble, just omit that part.
 
-## Special keycodes can be changed if desired
+
+## Concurrency is the devil's play toy
+
+One thing to be mindful of is that if you activate modifier keys, such as Shift, Ctrl, Alt, AltGr, and GUI, those modifiers will affect other currently running macros as well as anything you may be typing at the moment (even on a different keyboard).  So it is a very good practice to completely avoid using modifier keys in macros, unless you are not running the macro concurrently with any other keyboard usage (e.g. you are using a single macro in a repeat mode, and not touching any other keys).
+
+## Configuration
+
+### Set up the macro capability
+
+TBD
+
+### Set up the animation
+
+TBD
+
+### Special keycodes can be changed
 
 If your game (or other application) uses KC_F21 through KC_F24 for some purpose, and you want your macro to emit those keycodes, you'll need to change concurrent macros' special keycodes by adding new definitions in your keyboard's `config.h` file.  The defaults are shown below:
 ```
@@ -37,7 +52,4 @@ If your game (or other application) uses KC_F21 through KC_F24 for some purpose,
 #define KC_START_REPEAT KC_F21
 ```
 
-## Concurrency is the devil's play toy
-
-One thing to be mindful of is that if you activate modifier keys, such as Shift, Ctrl, Alt, AltGr, and GUI, those modifiers will affect other currently running macros as well as anything you may be typing at the moment (even on a different keyboard).  So it is a very good practice to completely avoid using modifier keys in macros, unless you are not running the macro concurrently with any other keyboard usage (e.g. you are using a single macro in a repeat mode, and not touching any other keys).
 
