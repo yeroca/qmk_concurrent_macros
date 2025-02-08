@@ -60,7 +60,7 @@ Add to your `keynap.json` file the following:
 Currently, the only animation available is for monochrome LED's.  An RGB one will be added reasonably soon.  In the meantime, if you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
 
 
-`#include "`(relative path to the QMK root directory)`/modules/qmk_concurrent_macros/concurrent_macros_animation/concurrent_macros_anim.h"`
+`#include "../concurrent_macros_animation/concurrent_macros_anim.h"`
 
 To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
 ```
