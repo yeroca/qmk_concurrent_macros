@@ -43,7 +43,7 @@ Also keep in mind that if you manually use any modifier keys while a macro is ru
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Conncurrent Macros module utilizes it.  To install the module, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  To install the module, run these commands:
 
 ```
 cd modules
