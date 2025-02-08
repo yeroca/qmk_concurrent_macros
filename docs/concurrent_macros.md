@@ -25,22 +25,55 @@ So for example, let's say you want the macro to start with "abc" then repeat the
 
 `abc{KC_F21}def{KC_F22}ghi`
 
-Note that if you don't need a preamble, you just omit that part and also `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.  If you don't need a postamble, just omit that part.
+Notes:
+
+ * If you don't need a preamble, you just omit that part and also the  `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.
+ * If you don't need a postamble, just omit that part.
+ * Only one preamble, one repeat section, and one postamble is allowed.  The code will catch most incorrect usages of the special codes, and then enter an error state.  If you have the animation activated, an error is displayed as a rapidly blinking key.
+ * When a macro is in the error state, you can use VIA to correct the macro content, and then you can retrigger the macro to try again.
 
 
 ## Concurrency is the devil's play toy
 
 One thing to be mindful of is that if you activate modifier keys, such as Shift, Ctrl, Alt, AltGr, and GUI, those modifiers will affect other currently running macros as well as anything you may be typing at the moment (even on a different keyboard).  So it is a very good practice to completely avoid using modifier keys in macros, unless you are running only the one macro and not providing any other keyboard input while it runs, for example you are using a single macro in a repeat mode, and not touching any other keys.
 
+Also keep in mind that if you manually use any modifier keys while a macro is running, it will affect keys being received by the computer.  For example if you have a macro that is continuously sending "a", and then while it's running, you hold down the shift key, the computer will start seeing repeated "A" keys.
+
 ## Configuration
 
 ### Set up the macro capability
 
-TBD
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  To install the module, run these commands:
+
+```
+cd modules
+git submodule add https://github.com/yeroca/qmk_concurrent_macros.git
+```
+
+Add to your `keynap.json` file the following:
+```
+"modules": ["qmk_concurrent_macros/concurrent_macros"]
+```
 
 ### Set up the animation
 
-TBD
+Currently, the only animation available is for monochrome LED's.  An RGB one will be added reasonably soon.  In the meantime, if you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
+
+`#include "../concurrent_macros_animation/concurrent_macros_anim.h"`
+
+To your keyboard's `config.h` file add:
+
+`#define LED_MATRIX_CUSTOM_KB`
+
+To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
+
+`            "concurrent_macros": true,`
+
+Optionally, you might want to make it the default animation by adding/setting this define in your keyboard's `config.h` file:
+
+```
+#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_CUSTOM_CONCURRENT_MACROS
+```
 
 ### Special keycodes can be changed
 
