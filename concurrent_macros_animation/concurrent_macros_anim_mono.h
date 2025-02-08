@@ -10,6 +10,10 @@ static inline uint8_t triangle_wave(uint32_t counter) {
     return ((masked >= 0x100) ? (uint8_t)(0x1ff - masked) : (uint8_t)masked);
 }
 
+#define NORMAL_RATE (time)
+#define SLOW_RATE (time >> 1)
+#define FAST_RATE (time << 2)
+
 static void iter_func(keypos_t* keypos, concurrent_macros_led_state_t led_state) {
     uint8_t  led_index = g_led_config.matrix_co[keypos->row][keypos->col];
     uint8_t  led_value;
@@ -17,13 +21,13 @@ static void iter_func(keypos_t* keypos, concurrent_macros_led_state_t led_state)
 
     switch (led_state) {
         case MACRO_LED_STATE_RUNNING:
-            led_value = triangle_wave(time);
+            led_value = triangle_wave(NORMAL_RATE);
             break;
         case MACRO_LED_STATE_STOPPING:
-            led_value = triangle_wave(time >> 1);
+            led_value = triangle_wave(SLOW_RATE);
             break;
         case MACRO_LED_STATE_ERROR:
-            led_value = triangle_wave(time << 2);
+            led_value = triangle_wave(FAST_RATE);
             break;
         case MACRO_LED_STATE_IDLE:
         default:

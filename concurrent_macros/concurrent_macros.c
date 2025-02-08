@@ -357,17 +357,18 @@ void concurrent_macros_macro_led_state_iterate(iterator_func func) {
             switch (macro->state) {
                 case CM_IDLE:
                     func(&(macro->keypos), MACRO_LED_STATE_IDLE);
-                    break;
+                    continue;
                 case CM_DO_NEXT:
-                    if (macro->flags & CM_FLAG_START_REPEAT) {
-                        if (macro->flags & CM_FLAG_STOP) {
-                            func(&(macro->keypos), MACRO_LED_STATE_STOPPING);
-                        }
+                    if (macro->flags & CM_FLAG_STOP) {
+                        func(&(macro->keypos), MACRO_LED_STATE_STOPPING);
+                    } else {
+                        func(&(macro->keypos), MACRO_LED_STATE_RUNNING);
                     }
-                    func(&(macro->keypos), MACRO_LED_STATE_RUNNING);
+                    continue;
                 case CM_ERROR:
                 default:
                     func(&(macro->keypos), MACRO_LED_STATE_ERROR);
+                    continue;
             }
         }
     }
