@@ -57,13 +57,27 @@ Add to your `keynap.json` file the following:
 
 ### Set up the animation
 
-Currently, the only animation available is for monochrome LED's.  An RGB one will be added reasonably soon.  In the meantime, if you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
+#### Monochrome LED keyboards
 
-`#include "../concurrent_macros_animation/concurrent_macros_anim.h"`
+If you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
+
+`#include "../concurrent_macros_animation/concurrent_macros_anim_mono.h"`
 
 To your keyboard's `config.h` file add:
 
 `#define LED_MATRIX_CUSTOM_KB`
+
+#### RGB LED keyboards
+
+If you have a keyboard with RGB LEDs which are individually controllable, create a file in your keyboard directory called `rgb_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
+
+`#include "../concurrent_macros_animation/concurrent_macros_anim_rgb.h"`
+
+To your keyboard's `config.h` file add:
+
+`#define RGB_MATRIX_CUSTOM_KB`
+
+#### For both monochrome and RGB keyboards
 
 To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
 
