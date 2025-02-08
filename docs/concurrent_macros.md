@@ -29,8 +29,8 @@ Notes:
 
  * If you don't need a preamble, you just omit that part and also the  `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.
  * If you don't need a postamble, just omit that part.
- * Only one preamble, repeat section, and postanble is allowed.  The code will catch most incorrect usages of the special codes, and then enter an error state.  If you have the animation activated, an error is displayed as a rapidly blinking key.
- * In the case of entering an error state, you can use VIA to correct the macro content, and then you can retrigger the macro to try again.
+ * Only one preamble, one repeat section, and one postamble is allowed.  The code will catch most incorrect usages of the special codes, and then enter an error state.  If you have the animation activated, an error is displayed as a rapidly blinking key.
+ * When a macro is in the error state, you can use VIA to correct the macro content, and then you can retrigger the macro to try again.
 
 
 ## Concurrency is the devil's play toy
