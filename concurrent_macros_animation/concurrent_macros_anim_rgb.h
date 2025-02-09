@@ -29,7 +29,7 @@ static void iter_func(keypos_t* keypos, concurrent_macros_led_state_t led_state)
             next_hsv = rgb_matrix_config.hsv;
             break;
     }
-    const rgb_t next_rgb = hsv_to_rgb(next_hsv); 
+    const rgb_t next_rgb = hsv_to_rgb(next_hsv);
     rgb_matrix_set_color(led_index, next_rgb.r, next_rgb.g, next_rgb.b);
 }
 
