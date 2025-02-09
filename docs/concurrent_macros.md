@@ -67,6 +67,10 @@ To your keyboard's `config.h` file add:
 
 `#define LED_MATRIX_CUSTOM_KB`
 
+To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
+
+`            "concurrent_macros": true,`
+
 #### RGB LED keyboards
 
 If you have a keyboard with RGB LEDs which are individually controllable, create a file in your keyboard directory called `rgb_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
@@ -77,17 +81,23 @@ To your keyboard's `config.h` file add:
 
 `#define RGB_MATRIX_CUSTOM_KB`
 
-#### For both monochrome and RGB keyboards
-
-To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
+To your keyboard's `keyboard.json` file, add the following line inside of the `"rgb_matrix"` / `"animations"` section:
 
 `            "concurrent_macros": true,`
 
-Optionally, you might want to make it the default animation by adding/setting this define in your keyboard's `config.h` file:
+#### For both monochrome and RGB keyboards
+
+Optionally, you might want to:
+
+ * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
 
 ```
 #define LED_MATRIX_DEFAULT_MODE LED_MATRIX_CUSTOM_CONCURRENT_MACROS
 ```
+
+ * Set other undesired/unused animations to false in your `keyboard.json` file
+ * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false
+
 
 ### Special keycodes can be changed
 
