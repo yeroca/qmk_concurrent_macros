@@ -29,7 +29,8 @@ Notes:
 
  * If you don't need a preamble, you just omit that part and also the  `{KC_F21}`.  In this case, `{KC_F22}` and `{KC_F24}` will repeat from the beginning of the macro.
  * If you don't need a postamble, just omit that part.
- * Only one preamble, one repeat section, and one postamble is allowed.  The code will catch most incorrect usages of the special codes, and then enter an error state.  If you have the animation activated, an error is displayed as a rapidly blinking key.
+ * If you don't want a repeat section, just don't use any of the special keycodes at all.
+ * A maximum of one preamble, one repeat section, and one postamble is allowed.  The code will catch most incorrect usages of the special keycodes, and then enter an error state.  If you have the animation activated, an error is displayed as a rapidly blinking key.
  * When a macro is in the error state, you can use VIA to correct the macro content, and then you can retrigger the macro to try again.
 
 
@@ -43,7 +44,14 @@ Also keep in mind that if you manually use any modifier keys while a macro is ru
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  To install the module, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/13), the community modules feature is available only in the `community-modules` branch of QMK.  You can switch to this branch from the default `master` branch and get the latest source code by running these commands:
+
+```
+git checkout community-modules
+git pull origin community-modules
+```
+
+To install the module, run these commands:
 
 ```
 cd modules
