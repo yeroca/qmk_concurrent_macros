@@ -44,7 +44,7 @@ Also keep in mind that if you manually use any modifier keys while a macro is ru
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/26), the community modules feature is now available in the `master` branch of QMK.  To get the latest source code, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  To get the latest source code, run these commands:
 
 ```
 git checkout master
