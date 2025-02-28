@@ -104,7 +104,7 @@ Optionally, you might want to:
 ```
 
  * Set other undesired/unused animations to false in your `keyboard.json` file
- * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false
+ * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `keyboard.json`.
 
 
 ### Special keycodes can be changed
