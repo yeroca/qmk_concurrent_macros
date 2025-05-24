@@ -84,6 +84,14 @@ To your keyboard's `info.json` or `keyboard.json` file, add the following line i
 "concurrent_macros": true,
 ```
 
+Optionally, you might want to:
+
+ * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
+
+```
+#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
+```
+
 #### RGB LED keyboards
 
 If you have a keyboard with RGB LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
@@ -103,15 +111,15 @@ To your keyboard's `info.json` or `keyboard.json` file, add the following line i
 "concurrent_macros": true,
 ```
 
-#### For both monochrome and RGB keyboards
-
 Optionally, you might want to:
 
  * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
 
 ```
-#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_CUSTOM_CONCURRENT_MACROS
+#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
 ```
+
+#### For both monochrome and RGB keyboards
 
  * Set other undesired/unused animations to false in your `info.json` or `keyboard.json` file
  * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `info.json` or `keyboard.json`.
