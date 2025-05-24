@@ -58,53 +58,71 @@ cd modules
 git submodule add https://github.com/yeroca/qmk_concurrent_macros.git
 ```
 
-Add to your `keynap.json` file the following:
+Add to your `info.json` or `keyboard.json` file the following:
 ```
 "modules": ["qmk_concurrent_macros/concurrent_macros"]
 ```
 
-### Set up the animation
+### Optional: Set up the animation
 
 #### Monochrome LED keyboards
 
-If you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
+If you have a keyboard with RGB LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
+```
+"qmk_concurrent_macros/concurrent_macros_led_matrix"
+```
+For example:
+```
+"modules": [
+        "qmk_concurrent_macros/concurrent_macros",
+        "qmk_concurrent_macros/concurrent_macros_led_matrix"
+],
+```
 
-`#include "../concurrent_macros_animation/concurrent_macros_anim_mono.h"`
-
-To your keyboard's `config.h` file add:
-
-`#define LED_MATRIX_CUSTOM_KB`
-
-To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
-
-`            "concurrent_macros": true,`
-
-#### RGB LED keyboards
-
-If you have a keyboard with RGB LEDs which are individually controllable, create a file in your keyboard directory called `rgb_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
-
-`#include "../concurrent_macros_animation/concurrent_macros_anim_rgb.h"`
-
-To your keyboard's `config.h` file add:
-
-`#define RGB_MATRIX_CUSTOM_KB`
-
-To your keyboard's `keyboard.json` file, add the following line inside of the `"rgb_matrix"` / `"animations"` section:
-
-`            "concurrent_macros": true,`
-
-#### For both monochrome and RGB keyboards
+To your keyboard's `info.json` or `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
+```
+"concurrent_macros": true,
+```
 
 Optionally, you might want to:
 
  * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
 
 ```
-#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_CUSTOM_CONCURRENT_MACROS
+#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
 ```
 
- * Set other undesired/unused animations to false in your `keyboard.json` file
- * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `keyboard.json`.
+#### RGB LED keyboards
+
+If you have a keyboard with RGB LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
+```
+"qmk_concurrent_macros/concurrent_macros_rgb_matrix"
+```
+For example:
+```
+"modules": [
+        "qmk_concurrent_macros/concurrent_macros",
+        "qmk_concurrent_macros/concurrent_macros_rgb_matrix"
+],
+```
+
+To your keyboard's `info.json` or `keyboard.json` file, add the following line inside of the `"rgb_matrix"` / `"animations"` section:
+```
+"concurrent_macros": true,
+```
+
+Optionally, you might want to:
+
+ * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
+
+```
+#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
+```
+
+#### For both monochrome and RGB keyboards
+
+ * Set other undesired/unused animations to false in your `info.json` or `keyboard.json` file
+ * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `info.json` or `keyboard.json`.
 
 
 ### Special keycodes can be changed
