@@ -1,7 +1,5 @@
 # Concurrent Macros for QMK
-
 This Concurrent Macros QMK community module provides a macro capability that's better suited to game playing than the core QMK does.
-
 Features:
  * Multiple macros can run simultaneously.  This is limited only by the user-modifiable `MAX_CONCURRENT_MACROS` (default 10)
  * Macros can set to repeat continuously, either in a toggle on/off mode, or while the key is held down
@@ -119,7 +117,7 @@ Optionally, you might want to:
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
 ```
 
-#### For both monochrome and RGB keyboards
+#### For both monochrome and RGB keyboards you might want to:
 
  * Set other undesired/unused animations to false in your `info.json` or `keyboard.json` file
  * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `info.json` or `keyboard.json`.
