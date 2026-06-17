@@ -65,7 +65,7 @@ Add to your `info.json` or `keyboard.json` file the following:
 
 #### Monochrome LED keyboards
 
-If you have a keyboard with RGB LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
+If you have a keyboard with monochrome (single-color) LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
 ```
 "qmk_concurrent_macros/concurrent_macros_led_matrix"
 ```
