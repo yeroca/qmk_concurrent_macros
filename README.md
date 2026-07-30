@@ -121,6 +121,21 @@ Optionally, you might want to:
 
  * Set other undesired/unused animations to false in your `info.json` or `keyboard.json` file
  * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `info.json` or `keyboard.json`.
+ * Modify the blink rate for the monochrome LEDs or the color cycle rate for the RGB LEDs by adding this definition to your keyboard's `config.h` file:
+```
+#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ rate_adjustment
+```
+where rate_adjustment is a small integer that adjusts upward or downward the rate of blinking/color cycling.  Positive integers speed up the rate by powers of two, while negative integers speed up the rate by powers of two.  So for example:
+```
+#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ 1
+```
+doubles the speed, whereas: 
+```
+#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ -2
+```
+cuts the speed by a factor of four.
+
+To make the arithmetic efficient, only powers of two speed changes are possible currently.
 
 
 ### Special keycodes can be changed

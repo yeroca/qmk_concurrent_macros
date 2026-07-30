@@ -10,9 +10,29 @@ static inline uint8_t triangle_wave(uint32_t counter) {
     return ((masked >= 0x100) ? (uint8_t)(0x1ff - masked) : (uint8_t)masked);
 }
 
-#define NORMAL_RATE (time)
-#define SLOW_RATE (time >> 1)
-#define FAST_RATE (time << 2)
+/*
+ * Negative RATE_ADJ makes the cycling faster, positive amounts make it
+ * slower
+ *
+ * RATE_ADJ has the opposite sign as the user-visible define to make the
+ * user setting more intuitive: larger values leads to a faster rate, and vice
+ * versa.
+ */
+#ifndef COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ
+#    define RATE_ADJ 0
+#else
+#    define RATE_ADJ (-COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ)
+#endif
+
+/*
+ * Shift amounts must be positive, so we need to switch directions when the
+ * shift amount is negative.
+ */
+#define SCALE_RATE(n, r) ((r + RATE_ADJ) < 0 ? n << -(r + RATE_ADJ) : n >> (r + RATE_ADJ))
+
+#define FAST_RATE (SCALE_RATE(time, -2))
+#define NORMAL_RATE (SCALE_RATE(time, 0))
+#define SLOW_RATE (SCALE_RATE(time, 1))
 
 static void iter_func(keypos_t* keypos, concurrent_macros_led_state_t led_state) {
     uint8_t  led_index = g_led_config.matrix_co[keypos->row][keypos->col];
