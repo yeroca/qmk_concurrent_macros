@@ -125,7 +125,7 @@ Optionally, you might want to:
 ```
 #define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ rate_adjustment
 ```
-where rate_adjustment is a small integer that adjusts upward or downward the rate of blinking/color cycling.  Positive integers speed up the rate by powers of two, while negative integers speed up the rate by powers of two.  So for example:
+where rate_adjustment is a small integer that adjusts upward or downward the rate of blinking/color cycling.  Positive integers speed up the rate by powers of two, while negative integers slow down the rate by powers of two.  So for example:
 ```
 #define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ 1
 ```
