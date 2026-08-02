@@ -42,10 +42,10 @@ Also keep in mind that if you manually use any modifier keys while a macro is ru
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  To get the latest source code, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  If you are not using the upstream QMK git tree, you'll need to figure out which branch (if any) witll work with this community module.  The git tree needs to have merged from upstream since March of 2025.  For Keychron's tree specifically, use the `q3_2025` branch. To get the latest source code, run these commands:
 
 ```
-git checkout master
+git checkout master  // see above for which branch to use
 git pull origin master
 ```
 
@@ -116,6 +116,8 @@ Optionally, you might want to:
 ```
 #define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
 ```
+
+In order to get the concurrent macros animation option to show up in VIA, you'll need to modify your keyboard's VIA .json file to add (and possibly remove) the animations in the list, adjusting the index numbers appropriately.  The concurrent macros animation will appear after the QMK included animations, but before the keyboard-specific animations.  For example, Keychron added a keyboard-specific animation called "Per-key RGB", which appears near the end of the list, so you'd need to add the concurrent macros animation before that one.
 
 #### For both monochrome and RGB keyboards you might want to:
 
