@@ -42,7 +42,7 @@ Also keep in mind that if you manually use any modifier keys while a macro is ru
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  If you are not using the upstream QMK git tree, you'll need to figure out which branch (if any) witll work with this community module.  The git tree needs to have merged from upstream since March of 2025.  For Keychron's tree specifically, use the `2025q3` branch. To get the latest source code, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  If you are not using the upstream QMK git tree, you'll need to figure out which branch (if any) will work with this community module.  The git tree needs to have merged from upstream since March of 2025.  For Keychron's tree specifically, use the `2025q3` branch. To get the latest source code, run these commands:
 
 ```
 git checkout master  // see above for which branch to use
