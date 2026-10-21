@@ -1,6 +1,5 @@
 #include "action.h"
 #include <ctype.h>
-#include <chvt.h>
 #include "concurrent_macros.h"
 #include "deferred_exec.h"
 #include "dynamic_keymap.h"
