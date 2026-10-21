@@ -13,7 +13,7 @@
 #    define DYNAMIC_KEYMAP_MACRO_DELAY TAP_CODE_DELAY
 #endif
 
-typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, CM_ERROR } concurrent_macros_state_t;
+typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, CM_EXPECT_X, CM_EXPECT_BUTTONS, CM_EXPECT_Y, CM_EXPECT_V, CM_EXPECT_H, CM_ERROR } concurrent_macros_state_t;
 
 #define CM_FLAG_REPEAT_UNTIL_TOGGLE_OFF (1 << 0)
 #define CM_FLAG_REPEAT_UNTIL_MACRO_KEY_UP (1 << 1)
@@ -131,6 +131,9 @@ static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, ui
 #ifndef KC_START_REPEAT
 #    define KC_START_REPEAT KC_F21
 #endif
+#ifndef KC_REPORT_MOUSE
+#    define KC_START_REPEAT KC_F20
+#endif
 
 static void concurrent_macros_stop_others(concurrent_macros_info_t *except_macro) {
     for (int idx = 0; idx < MAX_CONCURRENT_MACROS; idx++) {
@@ -154,8 +157,22 @@ static void concurrent_macros_stop_others(concurrent_macros_info_t *except_macro
     clear_keyboard();
 }
 
+static bool cm_in_report_mouse_state(concurrent_macro_state_t state) {
+	switch (state) {
+		CM_EXPECT_BUTTONS:
+		CM_EXPECT_X:
+		CM_EXPECT_Y:
+		CM_EXPECT_V:
+		CM_EXPECT_H:
+			return true;
+		default:
+			return false;
+	}
+}
+
 static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *macro_p) {
     uint8_t                   data[8];
+    report_mouse_t			  mouse_report;
     concurrent_macros_info_t *macro = (concurrent_macros_info_t *)macro_p;
 
     switch (macro->state) {
@@ -163,6 +180,11 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
             // nothing to do, why are we here?  is this an error?
             return 0;
         case CM_DO_NEXT:
+        case CM_DO_EXPECT_BUTTONS:
+        case CM_DO_EXPECT_X:
+        case CM_DO_EXPECT_Y:
+        case CM_DO_EXPECT_V:
+        case CM_DO_EXPECT_H:
             concurrent_macros_get_next(macro, data);
             if (macro->state == CM_ERROR) {
                 return 0;
@@ -177,6 +199,10 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                         case SS_TAP_CODE:
                         case SS_DOWN_CODE:
                         case SS_UP_CODE:
+							if (cm_in_report_mouse_state(macro->state)) {
+								macro->state = CM_ERROR;
+								return 0;
+							}
                             switch (data[2]) {
                                 case KC_HARD_STOP_OTHER_MACROS:
                                     concurrent_macros_stop_others(macro);
@@ -219,6 +245,11 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                         }
                                         return 1;
                                     }
+                                case KC_REPORT_MOUSE:
+									// expect buttons
+									macro->state = CM_EXPECT_BUTTONS;
+                                    return 1;
+                                    
                                 default:
                                     send_string_with_delay((const char *)data, 0);
                                     return MAX(DYNAMIC_KEYMAP_MACRO_DELAY, 1);
@@ -233,8 +264,87 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                 ms += keycode - '0';
                                 keycode = *(++ptr);
                             }
-                            // stay in CM_DO_NEXT state
-                            return ms;
+                            switch (macro->state) {
+								CM_EXPECT_BUTTONS:
+                                    if (ms <= 0xff)
+                                    	mouse_report.buttons = ms;
+										macro->state = CM_EXPECT_X;
+										return 1;
+                                    } else {
+										macro->state = CM_ERROR;
+										return 0;
+									}
+								CM_EXPECT_X:
+                                    if (ms <= 127) {
+                                    	mouse_report.x = (uint8_t)ms;
+										macro->state = CM_EXPECT_Y;
+										return 1;
+                                    } else 
+										if ((ms >= 9000) && (ms <= 9127)) {
+                                    		mouse_report.x = (uint8_t)(-(ms - 9000));
+											macro->state = CM_EXPECT_Y;
+                                            return 1;
+                                        } else {
+											macro->state = CM_ERROR;
+											return 0;
+										}
+									}
+								CM_EXPECT_Y:
+                                    if (ms <= 127) {
+                                    	mouse_report.y = (uint8_t)ms;
+										macro->state = CM_EXPECT_V;
+										return 1;
+                                    } else 
+										if ((ms >= 9000) && (ms <= 9127)) {
+                                    		mouse_report.y = (uint8_t)(-(ms - 9000));
+											macro->state = CM_EXPECT_V;
+                                            return 1;
+                                        } else {
+											macro->state = CM_ERROR;
+											return 0;
+										}
+									}
+								CM_EXPECT_V:
+                                    if (ms <= 127) {
+                                    	mouse_report.v = (uint8_t)ms;
+										macro->state = CM_EXPECT_H;
+										return 1;
+                                    } else 
+										if ((ms >= 9000) && (ms <= 9127)) {
+                                    		mouse_report.v = (uint8_t)(-(ms - 9000));
+											macro->state = CM_EXPECT_H;
+                                            return 1;
+                                        } else {
+											macro->state = CM_ERROR;
+											return 0;
+										}
+									}
+								CM_EXPECT_H:
+                                    if (ms <= 127) {
+                                    	mouse_report.h = (uint8_t)ms;
+										send_mouse_report(&mouse_report);
+										macro->state = CM_DO_NEXT;
+										return 1;
+                                    } else 
+										if ((ms >= 9000) && (ms <= 9127)) {
+                                    		mouse_report.h = (uint8_t)(-(ms - 9000));
+                                            send_mouse_report(&mouse_report);
+											macro->state = CM_DO_NEXT;
+                                            return 1;
+                                        } else {
+											macro->state = CM_ERROR;
+											return 0;
+										}
+									}
+                                CM_DO_NEXT:
+                            		// stay in CM_DO_NEXT state
+									return ms;
+								default:
+									// how'd we get here?
+									macro->state = CM_ERROR;
+									return 0;
+								}
+
                         default:
                             // unknown code
                             macro->state = CM_ERROR;
