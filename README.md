@@ -40,6 +40,51 @@ One thing to be mindful of is that if you activate modifier keys, such as Shift,
 
 Also keep in mind that if you manually use any modifier keys while a macro is running, it will affect keys being received by the computer.  For example if you have a macro that is continuously sending "a", and then while it's running, you hold down the shift key, the computer will start seeing repeated "A" keys.
 
+## Mouse control (alpha)
+
+You can emit mouse movements, button clicks, and wheel movements via a special keycode `KC_F20`.  The syntax is as follows:
+
+`{KC_F20}`_button state_`,`_x movement_`,`_y movement_`,`_v movement_`,`_h movement_`,`_repeat count_`,`_period_`;`
+
+Note: Embedded spaces and other characters are not allowed, and must be terminated with a semicolon.
+
+|field|meaning|allowed values|
+|---|---|---|
+|button state|state of the mouse buttons|0 <= x <= 255 (see details below)|
+|x movement|move mouse pointer in the x (horizontal) direction|-128 <= x <= 127|
+|y movement|move mouse pointer in the y (vertical) direction|-128 <= x <= 127|
+|v movement|move mouse wheel in the vertical direction|-128 <= x <= 127|
+|h movement|move mouse wheel in the horizontal direction|-128 <= x <= 127|
+|repeat count|repeat specified movement repeat count times|0 <= x <= 9999|
+|period|delay for period ms between each of the movements|0 <= x <= 9999|
+
+If field is left empty, it defaults to the value 0.
+
+|Button|value to add|
+|---|---|
+|1|1|
+|2|2|
+|3|4|
+|4|8|
+|5|16|
+|6|32|
+|7|64|
+|8|128|
+
+To press buttons 3 and 5 simultaneously, use the value (button 3)4 + (button 5)16 = 20
+
+Example: press button 3 for 500ms then release it:
+```
+{KC_F20}4,,,,,1,500;{KC_F20}0,,,,,1,1;
+```
+(remember the empty fields have a value of 0)
+
+To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the repeat_count field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the x movement field to 100, and the repeat count field to 5.  If the amount to move doesn't divide evenly, use one repeated command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For examples, to move 525, you could repeat a 100 movement 5 times, then do a final movement of 25.  Delaying 5ms between each mouse movement would look like this:
+```
+{KC_F20},100,,,,5,5;{KC_F20},25,,,,1,5;
+```
+(remember the empty fields have a value of 0)
+
 ## Configuration
 
 ### Set up the macro capability
