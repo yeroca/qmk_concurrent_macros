@@ -75,11 +75,11 @@ To press buttons 3 and 5 simultaneously, use the value (button 3)4 + (button 5)1
 
 Example: press button 3 for 500ms then release it:
 ```
-{KC_F20}4,,,,,1,500;{KC_F20}0,,,,,1,1;
+{KC_F20}4,,,,,1,500;{KC_F20},,,,,1,1;
 ```
 (remember the empty fields have a value of 0)
 
-To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the repeat_count field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the x movement field to 100, and the repeat count field to 5.  If the amount to move doesn't divide evenly, use one repeated command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 525, you could repeat a 100 movement 5 times, then do a final movement of 25.  Delaying 5ms between each mouse movement would look like this:
+To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the `repeat count` field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the `x movement` field to 100, and the `repeat count` field to 5.  If the amount to move doesn't divide evenly, use one `repeat count` command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 525, you could repeat a 100 movement 5 times, then do a final movement of 25.  Delaying 5ms between each mouse movement would look like this:
 ```
 {KC_F20},100,,,,5,5;{KC_F20},25,,,,1,5;
 ```
