@@ -46,7 +46,7 @@ You can emit mouse movements, button clicks, and wheel movements via a special k
 
 `{KC_F20}`_button state_`,`_x movement_`,`_y movement_`,`_v movement_`,`_h movement_`,`_repeat count_`,`_period_`;`
 
-Note: Embedded spaces and other characters are not allowed, and must be terminated with a semicolon.
+Note: fields are comma-separated, embedded spaces and other characters are not allowed, the command must be terminated with a semicolon after the final field.
 
 |field|meaning|allowed values|
 |---|---|---|
