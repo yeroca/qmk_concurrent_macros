@@ -56,7 +56,7 @@ Note: fields are comma-separated, embedded spaces and other characters are not a
 |_v movement_|move mouse wheel in the vertical direction|-128 <= _v movement_ <= 127|
 |_h movement_|move mouse wheel in the horizontal direction|-128 <= _h movement_ <= 127|
 |_repeat count_|repeat specified movement _repeat count_ times|0 <= _repeat count_ <= 9999|
-|_period_|delay for _period_ ms between each of the movements|0 <= _period_ <= 9999|
+|_period_|delay for _period_ ms between each of the repeated movements|0 <= _period_ <= 9999|
 
 If a field is left empty, the value of the field defaults to 0.
 
