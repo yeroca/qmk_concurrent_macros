@@ -70,7 +70,7 @@ static uint8_t concurrent_macros_get_next_char(concurrent_macros_info_t *const m
     return next_char;
 }
 
-static int32_t concurrent_macros_get_integer(concurrent_macros_info_t *const macro, bool last) {
+static int32_t concurrent_macros_get_integer(concurrent_macros_info_t *const macro, int32_t min_val, int32_t max_val, bool last) {
     int32_t val = 0;
     bool negative = false;
 
@@ -93,7 +93,13 @@ static int32_t concurrent_macros_get_integer(concurrent_macros_info_t *const mac
             }
         }
     }
-    return negative ? -val : val;
+    val = negative ? -val : val;
+    if ((val < min_val) || (val > max_val)) {
+        macro->state = CM_ERROR;
+        return 0;
+    } else {
+        return val;
+    }
 }
 
 static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, uint8_t *const data) {
@@ -262,69 +268,40 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                     int32_t val;
 
                                     // expect buttons
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, 0, 0xff, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val & 0xff) == val) {
-                                        // only lowest 8 bits can be set
-                                        macro->mouse_report.buttons = (uint8_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->mouse_report.buttons = (uint8_t)val;
+
                                     // expect x
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_XY_MIN, MOUSE_REPORT_XY_MAX, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= MOUSE_REPORT_XY_MIN) && (val <= MOUSE_REPORT_XY_MAX)) {
-                                        macro->mouse_report.x = (mouse_xy_report_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->mouse_report.x = (mouse_xy_report_t)val;
+
                                     // expect y
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_XY_MIN, MOUSE_REPORT_XY_MAX, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= MOUSE_REPORT_XY_MIN) && (val <= MOUSE_REPORT_XY_MAX)) {
-                                        macro->mouse_report.y = (mouse_xy_report_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->mouse_report.y = (mouse_xy_report_t)val;
+
                                     // expect v
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_HV_MIN, MOUSE_REPORT_HV_MAX, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= MOUSE_REPORT_HV_MIN) && (val <= MOUSE_REPORT_HV_MAX)) {
-                                        macro->mouse_report.v = (mouse_hv_report_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->mouse_report.v = (mouse_hv_report_t)val;
+
                                     // expect h
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_HV_MIN, MOUSE_REPORT_HV_MAX, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= MOUSE_REPORT_HV_MIN) && (val <= MOUSE_REPORT_HV_MAX)) {
-                                        macro->mouse_report.h = (mouse_hv_report_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->mouse_report.h = (mouse_hv_report_t)val;
+
                                     // expect rep_cnt
-                                    val = concurrent_macros_get_integer(macro, false);
+                                    val = concurrent_macros_get_integer(macro, 0, 9999, false);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= 0) && (val <= 9999)) {
-                                        macro->rep_cnt = (uint16_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->rep_cnt = (uint16_t)val;
+
                                     // expect period
-                                    val = concurrent_macros_get_integer(macro, true);
+                                    val = concurrent_macros_get_integer(macro, 0, 9999, true);
                                     if (macro->state == CM_ERROR) return 0;
-                                    if ((val >= 0) && (val <= 9999)) {
-                                        macro->period = (uint16_t)val;
-                                    } else {
-                                        macro->state = CM_ERROR;
-                                        return 0;
-                                    }
+                                    macro->period = (uint16_t)val;
+
                                     macro->state = CM_REPEAT_REPORT_MOUSE;
                                     return 1;
 
