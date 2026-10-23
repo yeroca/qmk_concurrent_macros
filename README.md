@@ -58,7 +58,7 @@ Note: fields are comma-separated, embedded spaces and other characters are not a
 |repeat count|repeat specified movement repeat count times|0 <= x <= 9999|
 |period|delay for period ms between each of the movements|0 <= x <= 9999|
 
-If a field is left empty, the value of the field defaults to the value 0.
+If a field is left empty, the value of the field defaults to 0.
 
 |Button|value to add|
 |---|---|
