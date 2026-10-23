@@ -81,7 +81,7 @@ Example: press button 3 for 500ms then release it:
 
 To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the _repeat count_ field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the _x movement_ field to 100, and the _repeat count_ field to 5.  If the amount to move doesn't divide evenly, use one _repeat count_ command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 527, you could repeat a 100 movement 5 times, then do a final movement of 27.  Delaying 5ms between each mouse movement would look like this:
 ```
-{KC_F20},100,,,,5,5;{KC_F20},25,,,,1,5;
+{KC_F20},100,,,,5,5;{KC_F20},27,,,,1,5;
 ```
 (remember the empty fields have a value of 0)
 
