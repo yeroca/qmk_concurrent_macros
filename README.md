@@ -58,13 +58,13 @@ Note: fields are comma-separated, embedded spaces and other characters are not a
 
 |field|meaning|allowed values|
 |---|---|---|
-|button state|state of the mouse buttons|0 <= x <= 255 (see details below)|
-|x movement|move mouse pointer in the x (horizontal) direction|-128 <= x <= 127|
-|y movement|move mouse pointer in the y (vertical) direction|-128 <= x <= 127|
-|v movement|move mouse wheel in the vertical direction|-128 <= x <= 127|
-|h movement|move mouse wheel in the horizontal direction|-128 <= x <= 127|
-|repeat count|repeat specified movement repeat count times|0 <= x <= 9999|
-|period|delay for period ms between each of the movements|0 <= x <= 9999|
+|_button state_|state of the mouse buttons|0 <= _button state_ <= 255 (see details below)|
+|_x movement_|move mouse pointer in the x (horizontal) direction|-128 <= _x movement_ <= 127|
+|_y movement_|move mouse pointer in the y (vertical) direction|-128 <= _y movement_ <= 127|
+|_v movement_|move mouse wheel in the vertical direction|-128 <= _v movement_ <= 127|
+|_h movement_|move mouse wheel in the horizontal direction|-128 <= _h movement_ <= 127|
+|_repeat count_|repeat specified movement _repeat count_ times|0 <= _repeat count_ <= 9999|
+|_period_|delay for _period_ ms between each of the repeated movements|0 <= _period_ <= 9999|
 
 If a field is left empty, the value of the field defaults to 0.
 
@@ -79,7 +79,7 @@ If a field is left empty, the value of the field defaults to 0.
 |7|64|
 |8|128|
 
-To press buttons 3 and 5 simultaneously, use the value (button 3)4 + (button 5)16 = 20
+To press buttons 3 and 5 simultaneously, use the value (button 3) 4 + (button 5) 16 = 20
 
 Example: press button 3 for 500ms then release it:
 ```
@@ -87,9 +87,9 @@ Example: press button 3 for 500ms then release it:
 ```
 (remember the empty fields have a value of 0)
 
-To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the `repeat count` field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the `x movement` field to 100, and the `repeat count` field to 5.  If the amount to move doesn't divide evenly, use one `repeat count` command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 525, you could repeat a 100 movement 5 times, then do a final movement of 25.  Delaying 5ms between each mouse movement would look like this:
+To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the _repeat count_ field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the _x movement_ field to 100, and the _repeat count_ field to 5.  If the amount to move doesn't divide evenly, use one _repeat count_ command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 527, you could repeat a 100 movement 5 times, then do a final movement of 27.  Delaying 5ms between each mouse movement would look like this:
 ```
-{KC_F20},100,,,,5,5;{KC_F20},25,,,,1,5;
+{KC_F20},100,,,,5,5;{KC_F20},27,,,,1,5;
 ```
 (remember the empty fields have a value of 0)
 
