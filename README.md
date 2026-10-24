@@ -40,9 +40,17 @@ One thing to be mindful of is that if you activate modifier keys, such as Shift,
 
 Also keep in mind that if you manually use any modifier keys while a macro is running, it will affect keys being received by the computer.  For example if you have a macro that is continuously sending "a", and then while it's running, you hold down the shift key, the computer will start seeing repeated "A" keys.
 
-## Mouse control (alpha)
+## Mouse control
 
-You can emit mouse movements, button clicks, and wheel movements via a special keycode `KC_F20`.  The syntax is as follows:
+If you add the following line to your keyboard's `config.h` file:
+```
+#define CONCURRENT_MACROS_MOUSE_ENABLE
+```
+you can emit mouse movements, button clicks, and wheel movements via a special keycode `KC_F20`.
+
+The tradeoff is that this option requires more RAM due to the need for additional macro state, and it requires a bit more flash memory (around 500 bytes) for the additional logic.  Increasing RAM usage may reduce the number of macros that can be running simultaneously.  Requiring more flash memory means there is less flash available for the contents of the macros. 
+
+The `KC_F20` syntax is as follows:
 
 `{KC_F20}`_button state_`,`_x movement_`,`_y movement_`,`_v movement_`,`_h movement_`,`_repeat count_`,`_period_`;`
 

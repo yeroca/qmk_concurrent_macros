@@ -7,14 +7,20 @@
 #include "matrix.h"
 #include "send_string.h"
 #include "util.h"
-#include "report.h"
-#include "host.h"
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+#	include "report.h"
+#	include "host.h"
+#endif
 
 #ifndef DYNAMIC_KEYMAP_MACRO_DELAY
 #    define DYNAMIC_KEYMAP_MACRO_DELAY TAP_CODE_DELAY
 #endif
 
-typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, CM_REPEAT_REPORT_MOUSE, CM_ERROR } concurrent_macros_state_t;
+typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, 
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+CM_REPEAT_REPORT_MOUSE,
+#endif
+CM_ERROR } concurrent_macros_state_t;
 
 #define CM_FLAG_REPEAT_UNTIL_TOGGLE_OFF (1 << 0)
 #define CM_FLAG_REPEAT_UNTIL_MACRO_KEY_UP (1 << 1)
@@ -30,9 +36,11 @@ typedef struct {
     keypos_t                  keypos;
     uint16_t                  start_offset;
     uint16_t                  offset;
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
     report_mouse_t            mouse_report;
     uint16_t                  rep_cnt;
     uint16_t                  period;
+#endif
 } concurrent_macros_info_t;
 
 #ifndef MAX_CONCURRENT_MACROS
@@ -64,6 +72,7 @@ static uint8_t find_concurrent_macro(keypos_t *keypos) {
 
 deferred_executor_t deferred_executor_table[MAX_CONCURRENT_MACROS];
 
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
 static uint8_t concurrent_macros_get_next_char(concurrent_macros_info_t *const macro) {
     uint8_t next_char;
     dynamic_keymap_macro_get_buffer(macro->offset++, 1, &next_char);
@@ -101,6 +110,7 @@ static int32_t concurrent_macros_get_integer(concurrent_macros_info_t *const mac
         return val;
     }
 }
+#endif
 
 static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, uint8_t *const data) {
     dynamic_keymap_macro_get_buffer(macro->offset++, 1, &data[0]);
@@ -173,8 +183,10 @@ static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, ui
 #ifndef KC_START_REPEAT
 #    define KC_START_REPEAT KC_F21
 #endif
-#ifndef KC_REPORT_MOUSE
-#    define KC_REPORT_MOUSE KC_F20
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+#    ifndef KC_REPORT_MOUSE
+#        define KC_REPORT_MOUSE KC_F20
+#    endif
 #endif
 
 static void concurrent_macros_stop_others(concurrent_macros_info_t *except_macro) {
@@ -264,6 +276,7 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                         }
                                         return 1;
                                     }
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
                                 case KC_REPORT_MOUSE:
                                     int32_t val;
 
@@ -304,6 +317,7 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
 
                                     macro->state = CM_REPEAT_REPORT_MOUSE;
                                     return 1;
+#endif
 
                                 default:
                                     send_string_with_delay((const char *)data, 0);
@@ -333,6 +347,8 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
             // shouldn't arrive here
             macro->state = CM_ERROR;
             return 0;
+
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
         case CM_REPEAT_REPORT_MOUSE:
             if (macro->rep_cnt--) {
                 host_mouse_send(&macro->mouse_report);
@@ -341,6 +357,7 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                 macro->state = CM_DO_NEXT;
                 return 1;
             }
+#endif
         case CM_ERROR:
             // this macro encountered an error.  This is a no-recovery state. Is it an error to reach this?
             return 0;
