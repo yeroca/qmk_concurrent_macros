@@ -1,5 +1,7 @@
 # Concurrent Macros for QMK
+
 This Concurrent Macros QMK community module provides a macro capability that's better suited to game playing than the core QMK does.
+
 Features:
  * Multiple macros can run simultaneously.  This is limited only by the user-modifiable `MAX_CONCURRENT_MACROS` (default 10)
  * Macros can set to repeat continuously, either in a toggle on/off mode, or while the key is held down
@@ -38,14 +40,67 @@ One thing to be mindful of is that if you activate modifier keys, such as Shift,
 
 Also keep in mind that if you manually use any modifier keys while a macro is running, it will affect keys being received by the computer.  For example if you have a macro that is continuously sending "a", and then while it's running, you hold down the shift key, the computer will start seeing repeated "A" keys.
 
+## Mouse control
+
+If you add the following line to your keyboard's `config.h` file:
+```
+#define CONCURRENT_MACROS_MOUSE_ENABLE
+```
+you can emit mouse movements, button clicks, and wheel movements via a special keycode `KC_F20`.
+
+The tradeoff is that this option requires more RAM due to the need for additional macro state, and it requires a bit more flash memory (around 500 bytes) for the additional logic.  Increasing RAM usage may reduce the number of macros that can be running simultaneously.  Requiring more flash memory means there is less flash available for the contents of the macros. 
+
+The `KC_F20` syntax is as follows:
+
+`{KC_F20}`_button state_`,`_x movement_`,`_y movement_`,`_v movement_`,`_h movement_`,`_repeat count_`,`_period_`;`
+
+Note: fields are comma-separated, embedded spaces and other characters are not allowed, the command must be terminated with a semicolon after the final field.
+
+|field|meaning|allowed values|
+|---|---|---|
+|_button state_|state of the mouse buttons|0 <= _button state_ <= 255 (see details below)|
+|_x movement_|move mouse pointer in the x (horizontal) direction|-128 <= _x movement_ <= 127|
+|_y movement_|move mouse pointer in the y (vertical) direction|-128 <= _y movement_ <= 127|
+|_v movement_|move mouse wheel in the vertical direction|-128 <= _v movement_ <= 127|
+|_h movement_|move mouse wheel in the horizontal direction|-128 <= _h movement_ <= 127|
+|_repeat count_|repeat specified movement _repeat count_ times|0 <= _repeat count_ <= 9999|
+|_period_|delay for _period_ ms between each of the repeated movements|0 <= _period_ <= 9999|
+
+If a field is left empty, the value of the field defaults to 0.
+
+|Button|value to add|
+|---|---|
+|1|1|
+|2|2|
+|3|4|
+|4|8|
+|5|16|
+|6|32|
+|7|64|
+|8|128|
+
+To press buttons 3 and 5 simultaneously, use the value (button 3) 4 + (button 5) 16 = 20
+
+Example: press button 3 for 500ms then release it:
+```
+{KC_F20}4,,,,,1,500;{KC_F20},,,,,1,1;
+```
+(remember the empty fields have a value of 0)
+
+To make the pointer move in the x direction by an amount greater than 127 (or -128), you can use the _repeat count_ field to move the pointer repeatedly by a smaller amount.  For example if you want to move the pointer by 500, set the _x movement_ field to 100, and the _repeat count_ field to 5.  If the amount to move doesn't divide evenly, use one _repeat count_ command to cover most of the distance, then use a final movement command for a smaller amount to cover the remaining distance.  For example, to move 527, you could repeat a 100 movement 5 times, then do a final movement of 27.  Delaying 5ms between each mouse movement would look like this:
+```
+{KC_F20},100,,,,5,5;{KC_F20},27,,,,1,5;
+```
+(remember the empty fields have a value of 0)
+
 ## Configuration
 
 ### Set up the macro capability
 
-The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  If you are not using the upstream QMK git tree, you'll need to figure out which branch (if any) will work with this community module.  The git tree needs to have merged from upstream since March of 2025.  For Keychron's tree specifically, use the `2025q3` branch. To get the latest source code, run these commands:
+The QMK source tree you use must have the Community Modules feature, because the Concurrent Macros module utilizes it.  At the time of this writing (2025/02/27), the community modules feature is now available in the `master` branch of QMK.  To get the latest source code, run these commands:
 
 ```
-git checkout master  // see above for which branch to use
+git checkout master
 git pull origin master
 ```
 
@@ -56,88 +111,53 @@ cd modules
 git submodule add https://github.com/yeroca/qmk_concurrent_macros.git
 ```
 
-Add to your `info.json` or `keyboard.json` file the following:
+Add to your `keynap.json` file the following:
 ```
 "modules": ["qmk_concurrent_macros/concurrent_macros"]
 ```
 
-### Optional: Set up the animation
+### Set up the animation
 
 #### Monochrome LED keyboards
 
-If you have a keyboard with monochrome (single-color) LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
-```
-"qmk_concurrent_macros/concurrent_macros_led_matrix"
-```
-For example:
-```
-"modules": [
-        "qmk_concurrent_macros/concurrent_macros",
-        "qmk_concurrent_macros/concurrent_macros_led_matrix"
-],
-```
+If you have a keyboard with monochrome LEDs which are individually controllable, create a file in your keyboard directory called `led_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
 
-To your keyboard's `info.json` or `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
-```
-"concurrent_macros": true,
-```
+`#include "../concurrent_macros_animation/concurrent_macros_anim_mono.h"`
 
-Optionally, you might want to:
+To your keyboard's `config.h` file add:
 
- * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
+`#define LED_MATRIX_CUSTOM_KB`
 
-```
-#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
-```
+To your keyboard's `keyboard.json` file, add the following line inside of the `"led_matrix"` / `"animations"` section:
+
+`            "concurrent_macros": true,`
 
 #### RGB LED keyboards
 
-If you have a keyboard with RGB LEDs which are individually controllable, add the following to your `info.json` or `keyboard.json` file in the `modules` key:
-```
-"qmk_concurrent_macros/concurrent_macros_rgb_matrix"
-```
-For example:
-```
-"modules": [
-        "qmk_concurrent_macros/concurrent_macros",
-        "qmk_concurrent_macros/concurrent_macros_rgb_matrix"
-],
-```
+If you have a keyboard with RGB LEDs which are individually controllable, create a file in your keyboard directory called `rgb_matrix_kb.inc`, at the same level as the `keymaps` directory, containing the following line:
 
-To your keyboard's `info.json` or `keyboard.json` file, add the following line inside of the `"rgb_matrix"` / `"animations"` section:
-```
-"concurrent_macros": true,
-```
+`#include "../concurrent_macros_animation/concurrent_macros_anim_rgb.h"`
+
+To your keyboard's `config.h` file add:
+
+`#define RGB_MATRIX_CUSTOM_KB`
+
+To your keyboard's `keyboard.json` file, add the following line inside of the `"rgb_matrix"` / `"animations"` section:
+
+`            "concurrent_macros": true,`
+
+#### For both monochrome and RGB keyboards
 
 Optionally, you might want to:
 
  * Make concurrent macros the default animation by adding/setting this define in your keyboard's `config.h` file:
 
 ```
-#define RGB_MATRIX_DEFAULT_MODE RGB_MATRIX_COMMUNITY_MODULE_CONCURRENT_MACROS
+#define LED_MATRIX_DEFAULT_MODE LED_MATRIX_CUSTOM_CONCURRENT_MACROS
 ```
 
-In order to get the concurrent macros animation option to show up in VIA, you'll need to modify your keyboard's VIA .json file to add (and possibly remove) the animations in the list, adjusting the index numbers appropriately.  The concurrent macros animation will appear after the QMK included animations, but before the keyboard-specific animations.  For example, Keychron added a keyboard-specific animation called "Per-key RGB", which appears near the end of the list, so you'd need to add the concurrent macros animation before that one.
-
-#### For both monochrome and RGB keyboards you might want to:
-
- * Set other undesired/unused animations to false in your `info.json` or `keyboard.json` file
- * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `info.json` or `keyboard.json`.
- * Modify the blink rate for the monochrome LEDs or the color cycle rate for the RGB LEDs by adding this definition to your keyboard's `config.h` file:
-```
-#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ rate_adjustment
-```
-where rate_adjustment is a small integer that adjusts upward or downward the rate of blinking/color cycling.  Positive integers speed up the rate by powers of two, while negative integers slow down the rate by powers of two.  So for example:
-```
-#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ 1
-```
-doubles the speed, whereas: 
-```
-#define COMMUNITY_MODULE_CONCURRENT_MACROS_RATE_ADJ -2
-```
-cuts the speed by a factor of four.
-
-To make the arithmetic efficient, only powers of two speed changes are possible currently.
+ * Set other undesired/unused animations to false in your `keyboard.json` file
+ * Modify your keyboard layout .json file that is used by VIA to add this lighting animation option and remove any ones that you set to false in `keyboard.json`.
 
 
 ### Special keycodes can be changed
@@ -148,6 +168,5 @@ If your game (or other application) uses F21 through F24 for some purpose, and y
 #define KC_REPEAT_UNTIL_TOGGLE_OFF KC_F24
 #define KC_REPEAT_UNTIL_MACRO_KEY_UP KC_F22
 #define KC_START_REPEAT KC_F21
+#define KC_REPORT_MOUSE KC_F20
 ```
-
-

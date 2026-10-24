@@ -7,12 +7,20 @@
 #include "matrix.h"
 #include "send_string.h"
 #include "util.h"
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+#	include "report.h"
+#	include "host.h"
+#endif
 
 #ifndef DYNAMIC_KEYMAP_MACRO_DELAY
 #    define DYNAMIC_KEYMAP_MACRO_DELAY TAP_CODE_DELAY
 #endif
 
-typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, CM_ERROR } concurrent_macros_state_t;
+typedef enum : uint8_t { CM_FREE, CM_IDLE, CM_DO_NEXT, 
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+CM_REPEAT_REPORT_MOUSE,
+#endif
+CM_ERROR } concurrent_macros_state_t;
 
 #define CM_FLAG_REPEAT_UNTIL_TOGGLE_OFF (1 << 0)
 #define CM_FLAG_REPEAT_UNTIL_MACRO_KEY_UP (1 << 1)
@@ -28,6 +36,11 @@ typedef struct {
     keypos_t                  keypos;
     uint16_t                  start_offset;
     uint16_t                  offset;
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+    report_mouse_t            mouse_report;
+    uint16_t                  rep_cnt;
+    uint16_t                  period;
+#endif
 } concurrent_macros_info_t;
 
 #ifndef MAX_CONCURRENT_MACROS
@@ -58,6 +71,46 @@ static uint8_t find_concurrent_macro(keypos_t *keypos) {
 }
 
 deferred_executor_t deferred_executor_table[MAX_CONCURRENT_MACROS];
+
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+static uint8_t concurrent_macros_get_next_char(concurrent_macros_info_t *const macro) {
+    uint8_t next_char;
+    dynamic_keymap_macro_get_buffer(macro->offset++, 1, &next_char);
+    return next_char;
+}
+
+static int32_t concurrent_macros_get_integer(concurrent_macros_info_t *const macro, int32_t min_val, int32_t max_val, bool last) {
+    int32_t val = 0;
+    bool negative = false;
+
+    while (1) {
+        uint8_t c = concurrent_macros_get_next_char(macro);
+        if (c == '-') {
+            negative = true;
+            continue;
+        }
+        if ((c >= '0') && (c <= '9')) {
+            val *= 10;
+            val += (int32_t)(c - '0');
+        } else {
+            if ((!last && (c == ',')) || (last && (c == ';'))) {
+                // hit terminator
+                break;
+            } else {
+                macro->state = CM_ERROR;
+                return 0;
+            }
+        }
+    }
+    val = negative ? -val : val;
+    if ((val < min_val) || (val > max_val)) {
+        macro->state = CM_ERROR;
+        return 0;
+    } else {
+        return val;
+    }
+}
+#endif
 
 static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, uint8_t *const data) {
     dynamic_keymap_macro_get_buffer(macro->offset++, 1, &data[0]);
@@ -129,6 +182,11 @@ static void concurrent_macros_get_next(concurrent_macros_info_t *const macro, ui
 #endif
 #ifndef KC_START_REPEAT
 #    define KC_START_REPEAT KC_F21
+#endif
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+#    ifndef KC_REPORT_MOUSE
+#        define KC_REPORT_MOUSE KC_F20
+#    endif
 #endif
 
 static void concurrent_macros_stop_others(concurrent_macros_info_t *except_macro) {
@@ -218,11 +276,53 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                         }
                                         return 1;
                                     }
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+                                case KC_REPORT_MOUSE:
+                                    int32_t val;
+
+                                    // expect buttons
+                                    val = concurrent_macros_get_integer(macro, 0, 0xff, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->mouse_report.buttons = (uint8_t)val;
+
+                                    // expect x
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_XY_MIN, MOUSE_REPORT_XY_MAX, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->mouse_report.x = (mouse_xy_report_t)val;
+
+                                    // expect y
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_XY_MIN, MOUSE_REPORT_XY_MAX, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->mouse_report.y = (mouse_xy_report_t)val;
+
+                                    // expect v
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_HV_MIN, MOUSE_REPORT_HV_MAX, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->mouse_report.v = (mouse_hv_report_t)val;
+
+                                    // expect h
+                                    val = concurrent_macros_get_integer(macro, MOUSE_REPORT_HV_MIN, MOUSE_REPORT_HV_MAX, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->mouse_report.h = (mouse_hv_report_t)val;
+
+                                    // expect rep_cnt
+                                    val = concurrent_macros_get_integer(macro, 0, 9999, false);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->rep_cnt = (uint16_t)val;
+
+                                    // expect period
+                                    val = concurrent_macros_get_integer(macro, 0, 9999, true);
+                                    if (macro->state == CM_ERROR) return 0;
+                                    macro->period = (uint16_t)val;
+
+                                    macro->state = CM_REPEAT_REPORT_MOUSE;
+                                    return 1;
+#endif
+
                                 default:
                                     send_string_with_delay((const char *)data, 0);
                                     return MAX(DYNAMIC_KEYMAP_MACRO_DELAY, 1);
                             }
-                            // stay in CM_DO_NEXT state
                         case SS_DELAY_CODE:
                             uint16_t ms      = 0;
                             uint8_t *ptr     = &data[2];
@@ -233,7 +333,7 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
                                 keycode = *(++ptr);
                             }
                             // stay in CM_DO_NEXT state
-                            return ms;
+                            return MAX(1, ms);
                         default:
                             // unknown code
                             macro->state = CM_ERROR;
@@ -248,6 +348,16 @@ static uint32_t concurrent_macros_execute_one_step(uint32_t trigger_time, void *
             macro->state = CM_ERROR;
             return 0;
 
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+        case CM_REPEAT_REPORT_MOUSE:
+            if (macro->rep_cnt--) {
+                host_mouse_send(&macro->mouse_report);
+                return MAX(1, macro->period);
+            } else {
+                macro->state = CM_DO_NEXT;
+                return 1;
+            }
+#endif
         case CM_ERROR:
             // this macro encountered an error.  This is a no-recovery state. Is it an error to reach this?
             return 0;
