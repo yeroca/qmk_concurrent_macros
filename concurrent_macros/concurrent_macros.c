@@ -416,6 +416,9 @@ static void concurrent_macros_send(uint8_t id, keypos_t *keypos) {
 
     switch (macro->state) {
         case CM_DO_NEXT:
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+        case CM_REPEAT_REPORT_MOUSE:
+#endif
             // macro is running already
             macro->flags |= CM_FLAG_STOP; // only used by KC_REPEAT_UNTIL_TOGGLE_OFF
             break;
@@ -468,6 +471,9 @@ void concurrent_macros_macro_led_state_iterate(iterator_func func) {
                     func(&(macro->keypos), MACRO_LED_STATE_IDLE);
                     continue;
                 case CM_DO_NEXT:
+#ifdef CONCURRENT_MACROS_MOUSE_ENABLE
+                case CM_REPEAT_REPORT_MOUSE:
+#endif
                     if (macro->flags & CM_FLAG_STOP) {
                         func(&(macro->keypos), MACRO_LED_STATE_STOPPING);
                     } else {
