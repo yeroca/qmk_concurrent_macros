@@ -54,7 +54,7 @@ The `KC_F20` syntax is as follows:
 
 `{KC_F20}`_button state_`,`_x movement_`,`_y movement_`,`_v movement_`,`_h movement_`,`_repeat count_`,`_period_`;`
 
-Note: fields are comma-separated, embedded spaces and other characters are not allowed, the command must be terminated with a semicolon after the final field.
+Note: fields are comma-separated, embedded spaces and other characters are not allowed, the command must be terminated with a semicolon after the final field.  Missing fields, values out of range, or extraneous characters all will cause the macro to go into an error state, and will rapidly blink the key used to trigger macro.  If you make a mistake and a macro goes into an error state, just fix it in VIA and try again.
 
 |field|meaning|allowed values|
 |---|---|---|
